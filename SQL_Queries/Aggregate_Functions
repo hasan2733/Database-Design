@@ -1,0 +1,131 @@
+-- Aggregation Functions:
+-- Low Level -> High Level
+
+-- Count(), Max(), Min(), Sum(), Avg()
+
+select count(*) from employee;
+
+select count(distinct dept_id) from Employee;
+
+select max(length(name)) from employee;
+
+select min(length(name)) from employee;
+
+SELECT DISTINCT dept_id
+FROM Employee
+WHERE basic_salary>15000;
+
+select avg (Basic_salary)
+from Employee;
+
+select avg (Basic_salary)
+from Employee 
+where dept_id = 3;
+
+select avg (Basic_salary)
+from Employee 
+group by dept_id;
+
+select Dept_Id, avg (Basic_salary)
+from Employee 
+group by dept_id;
+
+select Dept_Id, avg (Basic_salary)
+from Employee where avg (Basic_salary) > 15000
+group by dept_id;
+
+select Dept_Id, avg (Basic_salary)
+from Employee 
+group by dept_id order by avg (Basic_salary);
+
+select Dept_Id, avg (Basic_salary) as Avg_Basic_salary
+from Employee 
+group by dept_id order by Avg_Basic_salary;
+
+select D.Name, avg (E.basic_salary)
+from Employee E, Department D
+where E.dept_id=D.dept_id
+group by D.name;
+
+select D.Name, avg (E.basic_salary+E.Others)
+from Employee E, Department D
+where E.dept_id=D.dept_id
+group by D.name;
+
+
+-- Subquaries
+
+select * from Employee
+where Basic_Salary>(select Basic_Salary from Employee where ids=1);
+
+
+--select max(avg(Basic_Salary)) from Employee group by dept_id;
+--select min(avg(Basic_Salary)) from Employee group by dept_id;
+
+SELECT MAX(avg_salary)
+FROM (
+    SELECT AVG(Basic_Salary) AS avg_salary
+    FROM Employee
+    GROUP BY dept_id
+) AS dept_avg;
+
+SELECT dept_id, AVG(Basic_Salary) AS avg_salary
+FROM Employee
+GROUP BY dept_id
+ORDER BY avg_salary DESC
+LIMIT 1;
+
+SELECT MIN(avg_salary)
+FROM (
+    SELECT AVG(Basic_Salary) AS avg_salary
+    FROM Employee
+    GROUP BY dept_id
+) AS dept_avg;
+
+
+select A.Dept_Name, A.Avg_Total_Income from 
+(
+ select D.Name as Dept_Name, avg(E.Basic_Salary+E.Others) as Avg_Total_Income
+ from Employee E, Department D 
+ where D.Dept_Id=E.Dept_Id group by D.Name
+) A
+where A.Avg_Total_Income >= 15000;
+
+-- Can be done in the following way
+
+select D.Name, avg(E.basic_salary+E.Others)
+from Employee E, Department D
+where E.dept_id=D.dept_id
+group by D.name
+having avg(E.basic_salary+E.Others) >15000;
+
+-- Other combinations
+
+select D.Name, min(E.basic_salary+E.Others)
+from Employee E, Department D
+where E.dept_id=D.dept_id
+group by D.name
+having min(E.basic_salary+E.Others) >15000;
+
+select D.Name, max(E.basic_salary+E.Others)
+from Employee E, Department D
+where E.dept_id=D.dept_id
+group by D.name
+having max(E.basic_salary+E.Others) >15000;
+
+-- Something more cool
+
+select D.Name, avg (E.basic_salary+E.Others)
+from Employee E, Department D
+where E.dept_id=D.dept_id
+group by D.name
+having avg (E.basic_salary+E.Others) > (select avg(basic_salary) from employee);
+
+-- Multiple group by
+
+select gender, type, sum(basic_salary) from employee
+group by gender, type;
+
+select dept_id, type, avg (Basic_salary)
+from Employee 
+group by dept_id, type;
